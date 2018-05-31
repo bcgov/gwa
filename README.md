@@ -2,7 +2,7 @@
 Gateway Administration
 ## Main
 This project contains following components
-* [Kong is a cloud-native, fast, scalable, and distributed Microservice Abstraction Layer (also known as an API Gateway, API Middleware or in some cases Service Mesh)](https://github.com/kong/kong) 
+* [Kong - cloud-native, fast, scalable, and distributed Microservice Abstraction Layer (AKA an API Gateway, API Middleware or in some cases Service Mesh)](https://github.com/kong/kong) 
 * [GWA-UI](https://github.com/bcgov/gwa-ui)
 * [GWA-KONG-ENDPOINT](https://github.com/bcgov/gwa-kong-endpoint)
 
