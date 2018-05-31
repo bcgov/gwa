@@ -1,6 +1,7 @@
 # GWA
 Gateway Administration
-[Status](https://github.com/BCDevOps/openshift-wiki/wiki/API-Management-Service-(Kong-Service-Mesh))
+
+[Current Status](https://github.com/BCDevOps/openshift-wiki/wiki/API-Management-Service-(Kong-Service-Mesh))
 
 ## Main
 This project contains following components
