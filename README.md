@@ -1,5 +1,7 @@
 # GWA
 Gateway Administration
+[Status](https://github.com/BCDevOps/openshift-wiki/wiki/API-Management-Service-(Kong-Service-Mesh))
+
 ## Main
 This project contains following components
 * [Kong - cloud-native, fast, scalable, and distributed Microservice Abstraction Layer (AKA an API Gateway, API Middleware or in some cases Service Mesh)](https://github.com/kong/kong) 
