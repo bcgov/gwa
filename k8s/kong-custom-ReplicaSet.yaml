@@ -80,7 +80,7 @@ spec:
     spec:
       containers:
       - name: kong
-        image: docker-registry.pathfinder.bcgov/dbc-konga-tools/kong-docker
+        image: docker-registry.pathfinder.gov.bc.ca/dbc-konga-tools/kong-docker
         env:
           - name: KONG_ADMIN_LISTEN
             value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
@@ -131,7 +131,7 @@ spec:
     spec:
       containers:
       - name: kong-custom-migration
-        image: docker-registry.pathfinder.bcgov/dbc-konga-tools/kong-docker
+        image: docker-registry.pathfinder.gov.bc.ca/dbc-konga-tools/kong-docker
         env:
           - name: KONG_NGINX_DAEMON
             value: 'off'
