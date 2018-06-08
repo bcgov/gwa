@@ -80,7 +80,7 @@ spec:
     spec:
       containers:
       - name: kong
-        image: 172.50.0.2:5000/dbc-konga-tools/kong-docker
+        image: 172.50.0.2:5000/dbc-konga-tools/kong-k8s
         env:
           - name: KONG_ADMIN_LISTEN
             value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
@@ -131,7 +131,7 @@ spec:
     spec:
       containers:
       - name: kong-custom-migration
-        image: 172.50.0.2:5000/dbc-konga-tools/kong-docker
+        image: 172.50.0.2:5000/dbc-konga-tools/kong-k8s
         env:
           - name: KONG_NGINX_DAEMON
             value: 'off'
