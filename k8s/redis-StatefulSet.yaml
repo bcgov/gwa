@@ -11,7 +11,7 @@ data:
     protected-mode no
 kind: ConfigMap
 metadata:
-  name: redis
+  name: redis-cluster
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
