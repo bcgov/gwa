@@ -17,7 +17,7 @@ k8s/          - OpenShift/Kubernetes cluster production ready deployment files
 ├── redis-StatefulSet.yaml                - Deployment of redis as kubernetes statefulset with persistent volume
 ├── redis-persistent-StatefulSet.yaml     - Deployment of redis as kubernetes statefulset with persistent volume
 ├── kong-k8s-noplugins.yaml               - Deployment of standard kong as kubernetes replicaSet
-└── kong-custom-ReplicaSet.yaml           - Deployment of custom kong as kubernetes replicaSet
+└── kong-custom-ReplicaSet.yaml           - Deployment of custom plugin with kong as kubernetes replicaSet
 ```
 
 ## Main
