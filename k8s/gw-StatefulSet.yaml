@@ -54,7 +54,7 @@ spec:
     spec:
       containers:
       - name: kong
-        image: kong
+        image: docker-registry.default.svc:5000/dbc-konga-tools/kong-k8s:latest
         env:
           - name: KONG_ADMIN_LISTEN
             value: "0.0.0.0:8001, 0.0.0.0:8444 ssl"
@@ -135,3 +135,27 @@ spec:
         emptyDir: {}
       - name: kong-run
         emptyDir: {}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kong-migration
+spec:
+  template:
+    metadata:
+      name: kong-migration
+    spec:
+      containers:
+      - name: kong-migration
+        image: docker-registry.default.svc:5000/dbc-konga-tools/kong-k8s:latest
+        env:
+          - name: KONG_NGINX_DAEMON
+            value: 'off'
+          - name: KONG_DATABASE
+            value: cassandra
+          - name: KONG_CASSANDRA_CONTACT_POINTS
+            value: cassandra
+          - name: KONG_CASSANDRA_KEYSPACE
+            value: kong
+        command: [ "/bin/sh", "-c", "kong migrations up" ]
+      restartPolicy: Never
