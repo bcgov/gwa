@@ -26,7 +26,7 @@ spec:
     spec:
       containers:
       - name: cassandra
-        image: cassandra:3.11
+        image: cassandra:3.11.2
         command:
           - /docker-entrypoint.sh
           - "-R"
