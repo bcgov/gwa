@@ -52,8 +52,10 @@ spec:
             exec:
               command: ["/bin/sh", "-c", "nodetool drain"]
         env:
-          - name: JAVA_OPTS
-            value: "-XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -XX:MaxRAMFraction=1"
+          - name: MAX_HEAP_SIZE
+            value: "1500M"
+          - name: HEAP_NEWSIZE
+            value: "100M"
           - name: CASSANDRA_LISTEN_ADDRESS
             valueFrom:
               fieldRef:
