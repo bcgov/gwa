@@ -123,8 +123,8 @@ data:
     - name: gwa-ip-anonymity
       service: gwa-demo-service
       config:
-        ipv4_mask: 1
-        ipv6_mask: 1
+        ipv4_mask: 0
+        ipv6_mask: 0
 kind: ConfigMap
 metadata:
   name: gwa-demo-config
