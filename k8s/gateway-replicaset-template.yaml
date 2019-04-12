@@ -1,0 +1,179 @@
+apiVersion: v1
+kind: Template
+metadata:
+  name: gateway
+  annotations:
+    description: "Template to deploy Gateway with kong as ReplicaSet"
+    iconClass: "icon-nginx"
+    tags: "api-management,Gateway"
+objects:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: gateway
+    name: gateway
+  spec:
+    loadBalancerSourceRanges:
+    - 0.0.0.0/0
+    ports:
+    - name: gw-proxy
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+    - name: gw-proxy-ssl
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    - name: gw-admin
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
+    - name: gw-admin-ssl
+      port: 8444
+      protocol: TCP
+      targetPort: 8444
+    - name: gw-cache
+      port: 6379
+      protocol: TCP
+      targetPort: 6379
+    selector:
+      app: gateway
+    type: LoadBalancer
+- apiVersion: apps/v1
+  kind: ReplicaSet
+  metadata:
+    labels:
+      app: gateway
+    name: gateway
+  spec:
+    selector:
+      matchLabels:
+        app: gateway
+    serviceName: gateway
+    template:
+      metadata:
+        labels:
+          app: gateway
+      spec:
+        containers:
+          - env:
+              - name: KONG_ADMIN_LISTEN
+                value: '0.0.0.0:8001, 0.0.0.0:8444 ssl'
+              - name: KONG_DATABASE
+                value: cassandra
+              - name: KONG_CASSANDRA_CONTACT_POINTS
+                value: cassandra
+              - name: KONG_CASSANDRA_KEYSPACE
+                value: kong
+              - name: KONG_CASSANDRA_REPL_FACTOR
+                value: '2'
+              - name: KONG_PROXY_ACCESS_LOG
+                value: /dev/stdout
+              - name: KONG_ADMIN_ACCESS_LOG
+                value: /dev/stdout
+              - name: KONG_PROXY_ERROR_LOG
+                value: /dev/stderr
+              - name: KONG_ADMIN_ERROR_LOG
+                value: /dev/stderr
+              - name: KONG_DB_UPDATE_PROPAGATION
+                value: '15'
+            image: docker-registry.default.svc:5000/dbc-konga-tools/kong-k8s:${KONG_VER}
+            imagePullPolicy: IfNotPresent
+            name: gateway
+            livenessProbe:
+              failureThreshold: 3
+              initialDelaySeconds: 45
+              periodSeconds: 10
+              successThreshold: 1
+              tcpSocket:
+                port: 8000
+              timeoutSeconds: 1
+            readinessProbe:
+              failureThreshold: 3
+              httpGet:
+                path: /status
+                port: 8001
+                scheme: HTTP
+              initialDelaySeconds: 55
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+            ports:
+              - containerPort: 8001
+                name: admin
+                protocol: TCP
+              - containerPort: 8000
+                name: proxy
+                protocol: TCP
+              - containerPort: 8443
+                name: proxy-ssl
+                protocol: TCP
+              - containerPort: 8444
+                name: admin-ssl
+                protocol: TCP
+            volumeMounts:
+              - mountPath: /usr/local/kong
+                name: kong-run
+          - name: redis
+            args:
+              - /conf/redis.conf
+            command:
+              - redis-server
+            image: redis
+            imagePullPolicy: Always
+            livenessProbe:
+              exec:
+                command:
+                  - sh
+                  - '-c'
+                  - redis-cli -h $(hostname) ping
+              failureThreshold: 3
+              initialDelaySeconds: 20
+              periodSeconds: 3
+              successThreshold: 1
+              timeoutSeconds: 1
+            ports:
+              - containerPort: 6379
+                name: client
+                protocol: TCP
+            readinessProbe:
+              exec:
+                command:
+                  - sh
+                  - '-c'
+                  - redis-cli -h $(hostname) ping
+              failureThreshold: 3
+              initialDelaySeconds: 15
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 5
+            volumeMounts:
+              - mountPath: /conf
+                name: conf
+              - mountPath: /data
+                name: data
+        volumes:
+          - configMap:
+              defaultMode: 420
+              items:
+                - key: redis.conf
+                  path: redis.conf
+              name: gw-cache
+            name: conf
+          - emptyDir: {}
+            name: data
+          - emptyDir: {}
+            name: kong-run
+- apiVersion: v1
+  data:
+    redis.conf: |-
+      appendonly no
+      protected-mode yes
+  kind: ConfigMap
+  metadata:
+    name: gw-cache
+parameters:
+- description: Password used for Redis authentication
+  name: KONG_VER
+  value: 0.14.1
