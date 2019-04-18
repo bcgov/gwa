@@ -16,7 +16,7 @@ k8s/          - OpenShift/Kubernetes cluster production ready deployment files
 ├── Cassandra-persistent-StatefulSet.yaml - Deployment of Cassandra as kubernetes statefulset with persistent volume
 ├── redis-StatefulSet.yaml                - Deployment of redis as kubernetes statefulset with persistent volume used by kong-ee
 ├── redis-persistent-StatefulSet.yaml     - Deployment of redis as kubernetes statefulset with persistent volume used by kong-ee
-├── gw-StatefulSet.yaml                   - Deployment of standard kong as kubernetes replicaSet used by kong-ce in production
+├── gw-StatefulSet.yaml                   - Deployment of standard kong as kubernetes StatefulSet, can be used by kong-ce in production
 ├── kong-k8s-noplugins.yaml               - Deployment of standard kong as kubernetes replicaSet
 └── kong-custom-ReplicaSet.yaml           - Deployment of custom plugin with kong as kubernetes replicaSet
 ```
