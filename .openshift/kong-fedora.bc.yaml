@@ -1,13 +1,13 @@
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
-  name: kong-rhel
+  name: kong-fc
 spec:
   tags:
   - annotations: null
     from:
       kind: DockerImage
-      name: docker-registry.default.svc:5000/dbc-oem-tools/kong-rhel
+      name: docker-registry.default.svc:5000/dbc-oem-tools/kong-fc
     name: latest
 status:
   dockerImageRepository: ""
@@ -16,16 +16,16 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   labels:
-    app: kong-rhel
-  name: kong-rhel
+    app: kong-fc
+  name: kong-fc
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: kong-rhel:latest
+      name: kong-fc:latest
   source:
     dockerfile: |-
-      FROM registry.access.redhat.com/rhel7
+      FROM fedora:29
       MAINTAINER leo.lou@gov.bc.ca
 
       LABEL name="Kong" \
@@ -36,22 +36,18 @@ spec:
             summary="Next-Generation API Platform for Modern Architectures" \
             description="Next-Generation API Platform for Modern Architectures"
 
-      RUN yum install -y libtool perl-core libyaml zlib-devel wget https://bintray.com/kong/kong-community-edition-rpm/download_file?file_path=rhel/7/kong-community-edition-$KONG_VERSION.rhel7.noarch.rpm && \
+      RUN dnf install -y wget https://bintray.com/kong/kong-community-edition-rpm/download_file?file_path=rhel/7/kong-community-edition-$KONG_VERSION.rhel7.noarch.rpm && \
           # OpenShift specific. OpenShift runs containers using an arbitrarily assigned user ID.
           # This user doesn't have access to change file permissions during runtime, they have to be changed during image building.
           # https://docs.okd.io/latest/creating_images/guidelines.html#use-uid
-          wget https://www.openssl.org/source/openssl-1.1.1b.tar.gz && tar -zxvf openssl-1.1.1b.tar.gz && \
-          cd openssl-1.1.1b && ./config --prefix=/ shared zlib-dynamic && make && make install_sw && cd / && rm -rf /openssl-* && \
-          yum clean all && \
           mkdir -p "/usr/local/kong" && \
           chgrp -R 0 "/usr/local/kong" && \
           chmod -R g=u "/usr/local/kong" && \
           wget -O /LICENSE "https://www.apache.org/licenses/LICENSE-2.0.txt" && \
-          wget -O /runme https://raw.githubusercontent.com/Kong/docker-kong/1.1.2/rhel/docker-entrypoint.sh && \
-          chmod 755 /runme
+          wget -O /entrypoint.sh "https://raw.githubusercontent.com/Kong/docker-kong/1.1.2/rhel/docker-entrypoint.sh" && chmod 755 /entrypoint.sh && \
+          dnf clean all
 
-      ENTRYPOINT ["/runme"]
-      VOLUME /usr/local/kong
+      ENTRYPOINT ["/entrypoint.sh"]
       EXPOSE 8000 8443 8001 8444
       STOPSIGNAL SIGTERM
       CMD ["kong", "docker-start"]
@@ -63,5 +59,5 @@ spec:
           value: '1.1.2'
       from:
         kind: DockerImage
-        name: registry.access.redhat.com/rhel7
+        name: fedora:29
     type: Docker
