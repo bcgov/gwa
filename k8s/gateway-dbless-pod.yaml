@@ -126,6 +126,7 @@ data:
       config:
         ipv4_mask: 0
         ipv6_mask: 0
+    plugins:        
     - name: rate-limiting
       route: gwa-demo
       config:
