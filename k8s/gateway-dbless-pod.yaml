@@ -125,9 +125,7 @@ data:
       service: gwa-demo-service
       config:
         ipv4_mask: 0
-        ipv6_mask: 0
-        
-    plugins:        
+        ipv6_mask: 0       
     - name: rate-limiting
       route: gwa-demo
       config:
