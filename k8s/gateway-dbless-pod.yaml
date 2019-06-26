@@ -126,7 +126,7 @@ data:
         ipv4_mask: 0
         ipv6_mask: 0       
     - name: rate-limiting
-      route: gwa-demo
+      service: gwa-demo-service
       config:
         second: 1
         minute: 10      
