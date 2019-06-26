@@ -55,7 +55,7 @@ spec:
           value: 'gwa-ip-anonymity'
         - name: KONG_DECLARATIVE_CONFIG
           value: /conf/kong.yaml
-      image: 'docker-registry.default.svc:5000/dbc-konga-tools/kong-k8s:1.1.1-mod'
+      image: 'docker-registry.default.svc:5000/dbc-konga-tools/kong-gwa:1.1.2'
       imagePullPolicy: Always
       name: gateway
       ports:
@@ -118,6 +118,7 @@ data:
       hosts: ["gwa-demo.pathfinder.gov.bc.ca"]
       plugins:
       - name: gwa-ip-anonymity
+      - name: rate-limiting
 
     plugins:
     - name: gwa-ip-anonymity
@@ -125,6 +126,11 @@ data:
       config:
         ipv4_mask: 0
         ipv6_mask: 0
+    - name: rate-limiting
+      route: gwa-demo
+      config:
+        minute: 10
+        
 kind: ConfigMap
 metadata:
   name: gwa-demo-config
