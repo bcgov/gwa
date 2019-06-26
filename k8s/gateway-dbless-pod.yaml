@@ -129,8 +129,9 @@ data:
     - name: rate-limiting
       route: gwa-demo
       config:
-        seconds: 1
-        minutes: 10
+        second: 1
+        minute: 10
+        
 kind: ConfigMap
 metadata:
   name: gwa-demo-config
