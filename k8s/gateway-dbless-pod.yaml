@@ -121,7 +121,7 @@ data:
 
     plugins:
     - name: gwa-ip-anonymity
-      service: gwa-demo-service
+      route: gwa-demo
       config:
         ipv4_mask: 0
         ipv6_mask: 0       
