@@ -124,12 +124,7 @@ data:
       route: gwa-demo
       config:
         ipv4_mask: 0
-        ipv6_mask: 0       
-    - name: rate-limiting
-      service: gwa-demo-service
-      config:
-        second: 1
-        minute: 10      
+        ipv6_mask: 0   
 kind: ConfigMap
 metadata:
   name: gwa-demo-config
