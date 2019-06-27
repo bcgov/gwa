@@ -21,6 +21,7 @@ kind: Pod
 metadata:
   labels:
     app: gateway
+    name: gateway-demo
   name: gateway
 spec:
   containers:
@@ -58,6 +59,10 @@ spec:
       image: 'docker-registry.default.svc:5000/dbc-konga-tools/kong-gwa:1.1.2'
       imagePullPolicy: Always
       name: gateway
+      lifecycle:
+        preStop:
+          exec:
+            command: ["/bin/sh", "-c", "kong stop"]
       ports:
         - containerPort: 8001
           name: admin
@@ -76,21 +81,16 @@ spec:
           name: kong-run
         - mountPath: /conf
           name: kong-conf
-    - name: httpie
+    - name: bat
       command:
         - tail
         - -f
         - /dev/null
-      image: alpine/httpie
+      image: alebatt/bat
       imagePullPolicy: Always
-      volumeMounts:
-        - mountPath: /.httpie
-          name: httpie-run
   volumes:
     - emptyDir: {}
       name: kong-run
-    - emptyDir: {}
-      name: httpie-run
     - configMap:
         defaultMode: 420
         items:
@@ -125,7 +125,14 @@ data:
       config:
         ipv4_mask: 0
         ipv6_mask: 0
-      
+    - name: rate-limiting
+      route: gwa-demo
+      config:
+        second: 1
+        minute: 10
+        policy: local
+        fault_tolerant: false
+
 kind: ConfigMap
 metadata:
   name: gwa-demo-config

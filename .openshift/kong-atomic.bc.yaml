@@ -1,0 +1,77 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: kong-atomic
+spec:
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: docker-registry.default.svc:5000/dbc-oem-tools/kong-atomic
+    name: latest
+status:
+  dockerImageRepository: ""
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: kong-atomic
+  name: kong-atomic
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: kong-atomic:latest
+  source:
+    dockerfile: |-
+      FROM registry.access.redhat.com/rhel-minimal
+      MAINTAINER leo.lou@gov.bc.ca
+
+      LABEL name="Kong" \
+            vendor="Kong" \
+            version="${KONG_VERSION}" \
+            release="1" \
+            url="https://konghq.com" \
+            summary="Next-Generation API Platform for Modern Architectures" \
+            description="Next-Generation API Platform for Modern Architectures"
+
+      RUN microdnf --enablerepo=rhel-7-server-rpms install --nodocs wget && \
+          wget https://bintray.com/kong/kong-rpm/rpm -O bintray-kong-kong-rpm.repo && \
+          sed -i -e 's/baseurl.*/&\/rhel\/7'/ bintray-kong-kong-rpm.repo && \
+          mv bintray-kong-kong-rpm.repo /etc/yum.repos.d/ && microdnf --enablerepo=bintray--kong-kong-rpm update && \
+          microdnf --enablerepo=rhel-7-server-rpms --enablerepo=bintray--kong-kong-rpm install --nodocs kong libyaml && \
+          # OpenShift specific. OpenShift runs containers using an arbitrarily assigned user ID.
+          # This user doesn't have access to change file permissions during runtime, they have to be changed during image building.
+          # https://docs.okd.io/latest/creating_images/guidelines.html#use-uid
+          #REPOLIST="rhel-7-server-rpms,rhel-7-server-optional-rpms,rhel-server-rhscl-7-rpms" && \
+          #INSTALL_PKGS="gzip libtool perl-core tar wget yum zlib-devel" && \
+          #KONG_RPM="https://bintray.com/kong/kong-community-edition-rpm/download_file?file_path=rhel/7/kong-community-edition-$KONG_VERSION.rhel7.noarch.rpm" && \
+          #yum -y install --enablerepo ${REPOLIST} ${KONG_RPM} && \
+          #rpm -Va --nofiles --nodigest && \
+          #wget https://www.openssl.org/source/openssl-1.1.1b.tar.gz && tar -zxvf openssl-1.1.1b.tar.gz && \
+          #cd openssl-1.1.1b && ./config --prefix=/ shared zlib-dynamic && make && make install_sw && cd / && rm -rf /openssl-* && \
+          mkdir -p "/usr/local/kong" && \
+          chgrp -R 0 "/usr/local/kong" && \
+          chmod -R g=u "/usr/local/kong" && \
+          wget -O /LICENSE "https://www.apache.org/licenses/LICENSE-2.0.txt" && \
+          wget -O /runme https://raw.githubusercontent.com/Kong/docker-kong/1.1.2/rhel/docker-entrypoint.sh && \
+          chmod 755 /runme && \
+          microdnf remove wget && microdnf clean all && \
+          rpm -Ufhv --nodeps http://download-ib01.fedoraproject.org/pub/fedora/linux/updates/29/Everything/x86_64/Packages/o/openssl-libs-1.1.1b-5.fc29.x86_64.rpm && rm -rf /tmp/*
+
+      ENTRYPOINT ["/runme"]
+      VOLUME /usr/local/kong
+      EXPOSE 8000 8443 8001 8444
+      STOPSIGNAL SIGTERM
+      CMD ["kong", "docker-start"]
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      env:
+        - name: KONG_VERSION
+          value: '1.1.2'
+      from:
+        kind: DockerImage
+        name: registry.access.redhat.com/rhel-minimal
+    type: Docker

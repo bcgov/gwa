@@ -1,0 +1,51 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: data-backuper
+spec:
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: docker-registry.default.svc:5000/dbc-oem-tools/data-backuper
+    name: latest
+status:
+  dockerImageRepository: ""
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    app: data-backuper
+  name: data-backuper
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: data-backuper:latest
+  source:
+    dockerfile: |-
+      FROM minio/mc
+      MAINTAINER leo.lou@gov.bc.ca
+
+      LABEL name="data-backuper" \
+            vendor="minio" \
+            release="1" \
+            url="dev@min.io" \
+            summary="dev@min.io" \
+            description="dev@min.io"
+
+      RUN apk update && apk add --no-cache rsync
+
+      VOLUME /.mc
+      CMD ["tail", "-f", "/dev/null"]
+    type: Dockerfile
+  strategy:
+    dockerStrategy:
+      env:
+        - name: MC_VERSION
+          value: 'latest'
+      from:
+        kind: DockerImage
+        name: minio/mc
+    type: Docker
