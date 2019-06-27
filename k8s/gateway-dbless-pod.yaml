@@ -25,7 +25,8 @@ metadata:
   name: gateway
 spec:
   containers:
-    - env:
+    - name: gateway
+      env:
         - name: KONG_ANONYMOUS_REPORTS
           value: 'off'
         - name: KONG_ADMIN_LISTEN
@@ -58,7 +59,6 @@ spec:
           value: /conf/kong.yaml
       image: 'docker-registry.default.svc:5000/dbc-konga-tools/kong-gwa:1.1.2'
       imagePullPolicy: Always
-      name: gateway
       lifecycle:
         preStop:
           exec:
