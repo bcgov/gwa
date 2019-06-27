@@ -118,7 +118,6 @@ data:
       hosts: ["gwa-demo.pathfinder.gov.bc.ca"]
       plugins:
       - name: gwa-ip-anonymity
-      - name: rate-limiting
 
     plugins:
     - name: gwa-ip-anonymity
@@ -126,9 +125,7 @@ data:
       config:
         ipv4_mask: 0
         ipv6_mask: 0
-    - name: rate-limiting
-      route: gwa-demo
-      config.second: 1        
+      
 kind: ConfigMap
 metadata:
   name: gwa-demo-config
