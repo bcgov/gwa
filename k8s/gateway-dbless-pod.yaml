@@ -118,6 +118,11 @@ data:
       hosts: ["gwa-demo.pathfinder.gov.bc.ca"]
       plugins:
       - name: gwa-ip-anonymity
+    - name: sysdig-demo
+      service: gwa-demo-service
+      paths: ["/nginx_status/"]
+      plugins:
+      - name: request-termination
 
     plugins:
     - name: gwa-ip-anonymity
@@ -132,6 +137,11 @@ data:
         minute: 10
         policy: local
         fault_tolerant: false
+    - name: request-termination
+      route: sysdig-demo
+      config:
+        status_code: 403
+        message: So long and thanks for all the fish!
 
 kind: ConfigMap
 metadata:
