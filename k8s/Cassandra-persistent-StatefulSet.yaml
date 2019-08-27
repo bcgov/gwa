@@ -19,11 +19,14 @@ metadata:
 spec:
   serviceName: cassandra
   replicas: 3
+  selector:
+    matchLabels:
+       statefulset: cassandra
+  serviceName: cassandra  
   template:
     metadata:
       labels:
         app: cassandra
-        statefulset: cassandra
     spec:
       affinity:
         podAntiAffinity:
