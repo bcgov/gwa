@@ -23,14 +23,13 @@ spec:
     metadata:
       labels:
         app: cassandra
-        statefulset: cassandra
     spec:
         affinity:
           podAntiAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
               - labelSelector:
                   matchExpressions:
-                    - key: statefulset
+                    - key: app
                       operator: In
                       values:
                         - cassandra
