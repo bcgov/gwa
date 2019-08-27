@@ -38,6 +38,16 @@ items:
           app: cassandra
       spec:
         terminationGracePeriodSeconds: 1800
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: statefulset
+                      operator: In
+                      values:
+                        - cassandra
+                topologyKey: kubernetes.io/hostname        
         containers:
         - name: cassandra
           image: cassandra:3.11.2
