@@ -27,6 +27,7 @@ spec:
     metadata:
       labels:
         app: cassandra
+        statefulset: cassandra
     spec:
       affinity:
         podAntiAffinity:
