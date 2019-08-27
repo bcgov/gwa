@@ -12,7 +12,7 @@ spec:
     app: cassandra
 
 ---
-apiVersion: "apps/v1beta1"
+apiVersion: "apps/v1"
 kind: StatefulSet
 metadata:
   name: cassandra
@@ -24,6 +24,16 @@ spec:
       labels:
         app: cassandra
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: statefulset
+                operator: In
+                values: 
+                - cassandra
+            topologyKey: "kubernetes.io/hostname"    
       containers:
       - name: cassandra
         image: cassandra:3.11.2
@@ -88,8 +98,10 @@ spec:
   - metadata:
       name: cassandra-data
       annotations:
+        volume.beta.kubernetes.io/storage-class: gluster-block
     spec:
       accessModes: [ "ReadWriteOnce" ]
+      storageClassName: gluster-block
       resources:
         requests:
           storage: 1Gi
