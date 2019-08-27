@@ -24,16 +24,16 @@ spec:
       labels:
         app: cassandra
     spec:
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: statefulset
-                operator: In
-                values: 
-                - cassandra
-            topologyKey: "kubernetes.io/hostname"    
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: statefulset
+                      operator: In
+                      values:
+                        - cassandra
+                topologyKey: kubernetes.io/hostname   
       containers:
       - name: cassandra
         image: cassandra:3.11.2
