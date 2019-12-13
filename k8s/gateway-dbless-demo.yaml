@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     app: gateway
-  name: gateway
+  name: gateway-demo
 spec:
   loadBalancerSourceRanges:
   - 0.0.0.0/0
@@ -12,6 +12,10 @@ spec:
     port: 8000
     protocol: TCP
     targetPort: 8000
+  - name: gw-admin-proxy
+    port: 8001
+    protocol: TCP
+    targetPort: 8001    
   selector:
     app: gateway
   type: LoadBalancer
@@ -61,7 +65,7 @@ spec:
             - name: KONG_HEADERS
               value: 'off'
             - name: KONG_NGINX_WORKER_PROCESSES
-              value: '1' 
+              value: '1'
             - name: KONG_PROXY_LISTEN
               value: '0.0.0.0:8000, 0.0.0.0:8443 http2 ssl'
             - name: KONG_REAL_IP_HEADER
