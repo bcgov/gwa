@@ -15,7 +15,7 @@ spec:
   - name: gw-admin-proxy
     port: 8001
     protocol: TCP
-    targetPort: 8001    
+    targetPort: 8001
   selector:
     app: gateway
   type: LoadBalancer
@@ -73,7 +73,7 @@ spec:
             - name: KONG_PLUGINS
               value: 'bundled,gwa-ip-anonymity'
             - name: KONG_DECLARATIVE_CONFIG
-              value: /conf/kong.yaml
+              value: /etc/kong.yaml
           image: 'docker-registry.default.svc:5000/dbc-konga-tools/kong-gwa:1.4.2'
           imagePullPolicy: Always
           lifecycle:
@@ -96,8 +96,9 @@ spec:
           volumeMounts:
             - mountPath: /usr/local/kong
               name: kong-run
-            - mountPath: /conf
+            - mountPath: /etc/kong.yaml
               name: kong-conf
+              subPath: kong.yaml
         - name: bat
           command:
             - tail
@@ -108,16 +109,16 @@ spec:
       volumes:
         - emptyDir: {}
           name: kong-run
-        - configMap:
-            defaultMode: 420
-            items:
-              - key: kong.yaml
-                path: kong.yaml
-            name: gwa-demo-config
+        - secret:
+            defaultMode: 0400
+            secretName: gwa-demo-config
           name: kong-conf
 ---
 apiVersion: v1
-data:
+kind: Secret
+metadata:
+  name: gwa-demo-config
+stringData:
   kong.yaml: |-
     _format_version: "1.1"
 
@@ -159,7 +160,3 @@ data:
       config:
         status_code: 403
         message: So long and thanks for all the fish!
-
-kind: ConfigMap
-metadata:
-  name: gwa-demo-config
